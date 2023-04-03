@@ -1,6 +1,6 @@
 {
   "name": "notedly-api",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "API code examples for JavaScript Everywhere by Adam Scott, published by O'Reilly Media",
   "main": "src/index.js",
   "scripts": {
