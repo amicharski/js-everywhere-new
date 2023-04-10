@@ -5,8 +5,15 @@ const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const { json } = require('body-parser');
 const cors = require('cors');
+const models = require('./models');
+
+require('dotenv').config();
+const db = require('./db');
 
 const port = process.env.PORT || 4000;
+const DB_HOST = process.env.DB_HOST;
+
+db.connect(DB_HOST);
 
 let notes = [
     { id: '1', content: 'This is a note', author: 'Adam Scott' },
@@ -35,7 +42,9 @@ const typeDefs = `#graphql
 const resolvers = {
     Query: {
         hello: () => 'Hello world!',
-        notes: () => notes,
+        notes: async () => {
+            return await models.Note.find();
+        },
         note: (parent, args) => {
             return notes.find(note => note.id === args.id);
         }
