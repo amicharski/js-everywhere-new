@@ -6,6 +6,8 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const { json } = require('body-parser');
 const cors = require('cors');
 const models = require('./models');
+const typeDefs = require('./schema');
+const resolvers = require('./resolvers');
 
 require('dotenv').config();
 const db = require('./db');
@@ -21,48 +23,13 @@ let notes = [
     { id: '3', content: 'Oh hey look, another note!', author: 'Riley Harrision' },
 ]
 
-const typeDefs = `#graphql
-    type Note {
-        id: ID!
-        content: String!
-        author: String!
-    }
-
-    type Query {
-        hello: String
-        notes: [Note!]!
-        note(id: ID!): Note!
-    }
-
-    type Mutation {
-        newNote(content: String!): Note!
-    }
-`;
-
-const resolvers = {
-    Query: {
-        hello: () => 'Hello world!',
-        notes: async () => {
-            return await models.Note.find();
-        },
-        note: (parent, args) => {
-            return notes.find(note => note.id === args.id);
-        }
-    },
-    Mutation: {
-        newNote: (parent, args) => {
-            let noteValue = {
-                id: String(notes.length + 1),
-                content: args.content,
-                author: 'Adam Scott'
-            };
-            notes.push(noteValue);
-            return noteValue;
-        }
-    }
-}
-
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ 
+    typeDefs, 
+    resolvers, 
+    context: () => {
+        return { models }
+    } 
+});
 
 server.start().then(() => {
     const app = express();
